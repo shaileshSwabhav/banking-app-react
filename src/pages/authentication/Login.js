@@ -3,11 +3,12 @@ import Input from "../../layout/Form/Input";
 
 const Login = () => {
 
-  const [loginForm, setLoginForm] = useState({
+  const loginFormValue = {
     email: "",
     password: "",
-  })
+  }
 
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,4}/
   const inputs = [
     {
       id: "email",
@@ -16,8 +17,8 @@ const Login = () => {
       label: "Email",
       placeholder: "example@domain.com",
       value: "",
-      errorMessage: "Valid email must be specified",
-      // pattern: "^[a-zA-Z]",
+      // errorMessage: "Valid email must be specified",
+      // pattern: emailRegex,
       required: true,
     },
     {
@@ -32,6 +33,8 @@ const Login = () => {
     },
   ]
 
+  const [loginForm, setLoginForm] = useState(loginFormValue)
+
   const onChange = (e) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value })
   }
@@ -39,10 +42,20 @@ const Login = () => {
   const onLoginSubmit = (e) => {
     e.preventDefault()
     console.log(loginForm);
+    console.log(loginFormValue);
 
     // set name attribute on input field to fetch data
     // const formData = new FormData(e.target)
     // console.log(Object.fromEntries(formData.entries()));
+  }
+
+  const validateLoginForm = (formValues) => {
+    if (!formValues.email) {
+      inputs[0].errorMessage = "Email must be specified"
+    } else if (emailRegex.test(formValues.email)) {
+      inputs[0].errorMessage = "Email must be of type example@domain.com"
+    }
+    
   }
 
   return (
@@ -57,6 +70,9 @@ const Login = () => {
               </div>
               <div className="pt-3 pb-5">
                 <div className="d-flex flex-column">
+
+                  <pre>{JSON.stringify(loginForm, undefined, 2)}</pre>
+
                   <form onSubmit={onLoginSubmit}>
 
                     {inputs.map((input) => (

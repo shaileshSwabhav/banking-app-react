@@ -4,14 +4,20 @@ import { getBanks as getBanksService } from "../../bank/service";
 const Bank = () => {
 
   const [banks, setBanks] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const getBanks = async () => {
     try {
+      setIsLoading(true)
       const response = await getBanksService()
       console.log(response);
       setBanks(response.data)
     } catch (error) {
-      console.error(error);
+      console.error("error msg -> ", error);
+      setError(error.message.message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -35,9 +41,23 @@ const Bank = () => {
   return (
     <>
       <div className="container-fluid">
-        <div className="row">
-          {banks.length > 0 && renderBanks}
-        </div>
+        {isLoading && <p>Loading...</p>}
+        {error &&
+          <div className="d-flex align-items-center full-h mt-3">
+            <div className="col-sm-12 col-md-8 mx-auto">
+              <div className="jumbotron">
+                <div className="form-group col-sm-12 col-md-12 col-lg-12 text-center">
+                  <h2>Banks not found</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        {!error &&
+          <div className="row">
+            {banks.length > 0 && renderBanks}
+          </div>
+        }
       </div>
     </>
   );

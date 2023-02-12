@@ -7,5 +7,6 @@ export const getBanks = async () => {
     return response
   } catch (error) {
     console.error(error);
+    throw new axios.AxiosError(error)
   }
 }
