@@ -1,0 +1,6 @@
+useState -> use to create reactive variable/object
+
+useEffect
+- gets executed on every render
+- useEffect should not change state coz it can use forever loop and stage change and rerender
+- passing [] will run useEffect only once during first render

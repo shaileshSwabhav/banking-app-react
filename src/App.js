@@ -1,24 +1,29 @@
-import logo from './logo.svg';
 import './App.css';
+import Navbar from './layout/Navbar/Navbar';
+import Footer from './layout/Footer/Footer';
+import Bank from "./pages/bank/components/Bank";
+import Account from './pages/account/components/Account';
+import { Routes, Route } from 'react-router-dom';
+import NotFound from './pages/not-found/components/NotFound';
 
 function App() {
+  const appName = "RBI"
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Navbar appName={appName} />
+      <Routes>
+
+        <Route path='/banks'>
+          <Route index element={<Bank />} />
+          <Route path=':bankID/accounts' element={<Account />} />
+        </Route>
+
+        <Route path='/accounts' element={<Account />} />
+        <Route path='*' element={<NotFound />} />
+      </Routes>
+      <Footer />
+    </>
   );
 }
 
