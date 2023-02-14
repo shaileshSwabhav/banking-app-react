@@ -1,5 +1,5 @@
 import axios from "axios";
-import * as constants from "../../../config/config"
+import * as constants from "../config/config"
 
 export const getBanks = async () => {
   try {

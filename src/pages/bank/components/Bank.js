@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getBanks as getBanksService } from "../../bank/service";
+import { getBanks as getBanksService } from "../../../service/bank";
 
 const Bank = () => {
 

@@ -1,23 +1,25 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Input from "../../layout/Form/Input";
+import { login as loginService } from "../../service/auth"
 
 const Login = () => {
 
   const loginFormValue = {
-    email: "",
+    username: "",
     password: "",
   }
 
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,4}/
+  // const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,4}/
   const inputs = [
     {
-      id: "email",
-      name: "email",
-      type: "email",
+      id: "username",
+      name: "username",
+      type: "username",
       label: "Email",
       placeholder: "example@domain.com",
       value: "",
-      // errorMessage: "Valid email must be specified",
+      errorMessage: "Invalid email specified. Email must be of the type example@domain.com",
       // pattern: emailRegex,
       required: true,
     },
@@ -34,6 +36,10 @@ const Login = () => {
   ]
 
   const [loginForm, setLoginForm] = useState(loginFormValue)
+  // const [roleName, setRoleName] = useLocalStorage("roleName", "admin")
+  // const [username, setUsername] = useLocalStorage("username", "shailesh")
+  // const [isAuthenticated, setIsAuthenticated] = useLocalStorage("isAuthenticated", 0)
+  const navigate = useNavigate()
 
   const onChange = (e) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value })
@@ -42,20 +48,38 @@ const Login = () => {
   const onLoginSubmit = (e) => {
     e.preventDefault()
     console.log(loginForm);
-    console.log(loginFormValue);
 
     // set name attribute on input field to fetch data
     // const formData = new FormData(e.target)
     // console.log(Object.fromEntries(formData.entries()));
+
+    validateLoginForm(loginForm)
   }
 
   const validateLoginForm = (formValues) => {
-    if (!formValues.email) {
-      inputs[0].errorMessage = "Email must be specified"
-    } else if (emailRegex.test(formValues.email)) {
-      inputs[0].errorMessage = "Email must be of type example@domain.com"
+    // do validations like valid email should be specified
+
+    login(loginForm)
+  }
+
+  const login = async (credential) => {
+    try {
+      const response = await loginService(credential)
+      console.log(response);
+
+      // setRoleName(response.data.roleName)
+      // setUsername(response.data.username)
+      // setIsAuthenticated(1)
+
+      localStorage.setItem("rolename", response.data.roleName.toLowerCase())
+      localStorage.setItem("username", response.data.username)
+      localStorage.setItem("isAuthenticated", 1)
+
+      // console.log(roleName, username, isAuthenticated);
+      navigate("/banks", { replace: false })
+    } catch (error) {
+      console.error(error);
     }
-    
   }
 
   return (

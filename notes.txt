@@ -5,7 +5,3 @@ useEffect
 - useEffect should not change state coz it can use forever loop and stage change and rerender
 - passing [] will run useEffect only once during first render
 
-
-
-EXCEL API
-- data > get data from web > add api endpoint (for header go into advance section and set headers) > click on ok
