@@ -1,4 +1,169 @@
+:root {
+  --darkorange: #E73A00;
+  --lgorange: #F69037;
+  --orange: #F6430F;
+  --blue: #004DC0;
+  --red: #FC4347;
+  --grey: #aeaeae;
+  --lg-grey: #F2F6F9;
+  --lg-blue: #f0f8ff;
+  --green: #4DBB81;
+  --lg-green: #35DE16;
+  --purple: #BA94D1;
+  --lg-yellow: #F1D459;
+  --grey: #BDBDBD;
+  --dark-teal: #0E5E6F;
+  --black: #000;
+}
+
 .anchor-tag {
   text-decoration: none;
-  color: #000;
+  color: var(--black);
+}
+
+/****************************************** TEXT ******************************************/
+.text-red {
+  color: var(--red);
+}
+
+.text-green {
+  color: var(--green);
+}
+
+.text-lggreen {
+  color: var(--lg-green);
+}
+
+.text-blue {
+  color: var(--blue);
+}
+
+.text-orange {
+  color: var(--orange);
+}
+
+.text-blue {
+  color: var(--blue);
+}
+
+/****************************************** BACKGROUND COLOR ******************************************/
+.bg-lgblue {
+  background-color: var(--lg-blue);
+}
+
+.bg-lggrey {
+  background-color: #F2F6F9;
+}
+
+.bg-green {
+  background-color: #5AAE7E;
+  color: #414141;
+}
+
+.bg-yellow {
+  background-color: var(--lg-yellow);
+  color: #414141;
+}
+
+.bg-grey {
+  background-color: var(--grey);
+  color: #414141;
+}
+
+.bg-purple {
+  background-color: var(--purple);
+  color: #414141;
+}
+
+/****************************************** BUTTONS ******************************************/
+.btn {
+  font-weight: 650;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.btn-blue {
+  background-color: var(--blue);
+  color: #fff;
+  font-weight: 650;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: 1px solid transparent;
+}
+
+.btn-blue:disabled {
+  background-color: var(--grey);
+  color: #fff;
+  font-weight: 650;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  cursor: not-allowed;
+}
+
+.btn-outline-blue {
+  background-color: #fff;
+  color: var(--blue);
+  font-weight: 650;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: 1px solid var(--blue);
+}
+
+.btn-outline-blue:disabled {
+  background-color: #fff;
+  color: var(--grey);
+  font-weight: 650;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: 1px solid var(--grey);
+  cursor: not-allowed;
+}
+
+.btn:disabled {
+  background-color: var(--grey);
+  color: #fff;
+  font-weight: 650;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  cursor: not-allowed;
+}
+
+.btn-green {
+  background-color: var(--green);
+  color: #fff;
+  font-weight: 650;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+}
+
+.btn-orange {
+  background-color: var(--orange);
+  color: #fff;
+  font-weight: 650;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
 }

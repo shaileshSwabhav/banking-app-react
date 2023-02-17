@@ -36,10 +36,11 @@ const Login = () => {
   ]
 
   const [loginForm, setLoginForm] = useState(loginFormValue)
+  const navigate = useNavigate()
+
   // const [roleName, setRoleName] = useLocalStorage("roleName", "admin")
   // const [username, setUsername] = useLocalStorage("username", "shailesh")
   // const [isAuthenticated, setIsAuthenticated] = useLocalStorage("isAuthenticated", 0)
-  const navigate = useNavigate()
 
   const onChange = (e) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value })
@@ -56,15 +57,14 @@ const Login = () => {
     validateLoginForm(loginForm)
   }
 
-  const validateLoginForm = (formValues) => {
+  const validateLoginForm = () => {
     // do validations like valid email should be specified
-
-    login(loginForm)
+    login()
   }
 
-  const login = async (credential) => {
+  const login = async () => {
     try {
-      const response = await loginService(credential)
+      const response = await loginService(loginForm)
       console.log(response);
 
       // setRoleName(response.data.roleName)
@@ -110,6 +110,7 @@ const Login = () => {
                       </button>
                     </div>
                   </form>
+
                 </div>
               </div>
             </div>
