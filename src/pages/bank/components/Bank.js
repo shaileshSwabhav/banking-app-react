@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getBanks as getBanksService, deleteBank as deleteBankService } from "../../../service/bank";
-import AddBank from "./AddBank";
+import SaveBank from "./SaveBank";
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from "react-router-dom";
@@ -54,7 +54,7 @@ const Bank = () => {
       //     </div>
       //   </a>
       // </div>
-      <tr key={bank.id} onClick={() => navigateToAccounts(bank.id)}>
+      <tr key={bank.id} className='cursor-pointer' onClick={() => navigateToAccounts(bank.id)}>
         <td>{index + 1}</td>
         <td>{bank.fullName}</td>
         <td>{bank.abbreviation}</td>
@@ -73,7 +73,7 @@ const Bank = () => {
     <>
       <div className="container">
 
-        <AddBank getBanks={getBanks} />
+        <SaveBank getBanks={getBanks} />
         {isLoading && <p>Loading...</p>}
         {error &&
           <div className="d-flex align-items-center full-h mt-3">
@@ -89,7 +89,7 @@ const Bank = () => {
 
         {!error && banks.length > 0 &&
 
-          <Table striped bordered responsive>
+          <Table striped bordered responsive hover>
             <thead>
               <tr>
                 <th>Sr no.</th>

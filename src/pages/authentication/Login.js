@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Input from "../../layout/Form/Input";
+import Input from "../../layout/Form/Input/Input";
 import { login as loginService } from "../../service/auth"
 
 const Login = () => {
@@ -71,6 +71,7 @@ const Login = () => {
       // setUsername(response.data.username)
       // setIsAuthenticated(1)
 
+      localStorage.setItem("credentialID", response.data.id)
       localStorage.setItem("rolename", response.data.roleName.toLowerCase())
       localStorage.setItem("username", response.data.username)
       localStorage.setItem("isAuthenticated", 1)

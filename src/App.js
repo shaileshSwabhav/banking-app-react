@@ -7,15 +7,15 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import NotFound from './pages/not-found/components/NotFound';
 import Login from './pages/authentication/Login';
 import { useEffect } from 'react';
-import useLocalStorage from "./hooks/useLocalStorage";
+// import useLocalStorage from "./hooks/useLocalStorage";
 
 function App() {
   const appName = "Yess"
-  const [isAuthenticated, setIsAuthenticated] = useLocalStorage("isAuthenticated", 0)
+  // const [isAuthenticated, setIsAuthenticated] = useLocalStorage("isAuthenticated", 0)
 
-  useEffect(() => {
-    console.log(isAuthenticated);
-  }, [])
+  // useEffect(() => {
+  //   console.log(isAuthenticated);
+  // }, [])
 
   return (
     <>
