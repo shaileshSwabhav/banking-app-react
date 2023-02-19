@@ -1,5 +1,4 @@
 import './App.css';
-import Navbar from './layout/Navbar/Navbar';
 // import Footer from './layout/Footer/Footer';
 import Bank from "./pages/bank/components/Bank";
 import Account from './pages/account/components/Account';
@@ -7,10 +6,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import NotFound from './pages/not-found/components/NotFound';
 import Login from './pages/authentication/Login';
 import { useEffect } from 'react';
+import Customer from './pages/customer/components/Customer';
 // import useLocalStorage from "./hooks/useLocalStorage";
 
 function App() {
-  const appName = "Yess"
   // const [isAuthenticated, setIsAuthenticated] = useLocalStorage("isAuthenticated", 0)
 
   // useEffect(() => {
@@ -19,7 +18,6 @@ function App() {
 
   return (
     <>
-      <Navbar appName={appName} />
       <Routes>
         {/* specify default route */}
         <Route path='' element={<Navigate to="/login" />}></Route>
@@ -32,6 +30,7 @@ function App() {
         </Route>
 
         <Route path='/accounts' element={<Account />} />
+        <Route path='/customers' element={<Customer />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
       {/* <Footer /> */}

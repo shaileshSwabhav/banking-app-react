@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// import useLocalStorage from "../../hooks/useLocalStorage";
 import Input from "../../layout/Form/Input/Input";
 import { login as loginService } from "../../service/auth"
 
@@ -38,8 +39,9 @@ const Login = () => {
   const [loginForm, setLoginForm] = useState(loginFormValue)
   const navigate = useNavigate()
 
-  // const [roleName, setRoleName] = useLocalStorage("roleName", "admin")
-  // const [username, setUsername] = useLocalStorage("username", "shailesh")
+  // const [roleName, setRoleName] = useLocalStorage("roleName", "")
+  // const [username, setUsername] = useLocalStorage("username", "")
+  // const [credentialID, setCredentialID] = useLocalStorage("credentialID", "")
   // const [isAuthenticated, setIsAuthenticated] = useLocalStorage("isAuthenticated", 0)
 
   const onChange = (e) => {
@@ -67,6 +69,7 @@ const Login = () => {
       const response = await loginService(loginForm)
       console.log(response);
 
+      // setCredentialID(response.data.id)
       // setRoleName(response.data.roleName)
       // setUsername(response.data.username)
       // setIsAuthenticated(1)

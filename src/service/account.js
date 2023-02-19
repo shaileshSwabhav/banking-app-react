@@ -41,3 +41,17 @@ export const updateAccount = async (account) => {
     throw new axios.AxiosError(error)
   }
 }
+
+export const deleteAccount = async (accountID) => {
+  try {
+    const headers = { "Content-type": "application/json" }
+    const response = await axios.delete(`${constants.BASE_URL}/accounts/${accountID}`, {
+      headers: headers,
+    })
+
+    return response
+  } catch (error) {
+    console.error(error);
+    throw new axios.AxiosError(error)
+  }
+}

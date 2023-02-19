@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
-import { getBanks as getBanksService, deleteBank as deleteBankService } from "../../../service/bank";
-import SaveBank from "./SaveBank";
 import Navbar from '../../../layout/Navbar/Navbar';
+import { getCustomers as getCustomerService } from "../../../service/customer";
+import CustomerForm from "./CustomerForm";
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-import { useNavigate } from "react-router-dom";
 
-const Bank = () => {
+const Customer = () => {
 
-  const [banks, setBanks] = useState([])
+  const [customers, setCustomer] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
-  const navigate = useNavigate()
 
-  const getBanks = async () => {
+  const getCustomers = async () => {
     try {
       setIsLoading(true)
-      const response = await getBanksService()
+      const response = await getCustomerService()
       console.log(response);
-      setBanks(response.data)
+      setCustomer(response.data)
+
     } catch (error) {
       console.error("error msg -> ", error);
       setError(error.message.message)
@@ -27,80 +26,71 @@ const Bank = () => {
     }
   }
 
-  const deleteBank = async (bankID) => {
-    try {
-      setIsLoading(true)
-      const response = await deleteBankService(bankID)
-      console.log(response)
-      getBanks()
-    } catch (error) {
-      console.error("error msg -> ", error);
-      setError(error.message.message)
-    } finally {
-      setIsLoading(false)
-    }
+  const deleteCustomer = async (customerID) => {
+    console.log(customerID);
   }
 
-  const navigateToAccounts = (bankID) => {
-    navigate(`/banks/${bankID}/accounts`)
-  }
+  useEffect(() => {
+    getCustomers()
+  }, [])
 
-  const renderBanks = banks.map((bank, index) => {
+  const renderCustomers = customers.map((customer, index) => {
     return (
-      <tr key={bank.id} className='cursor-pointer' onClick={() => navigateToAccounts(bank.id)}>
+      <tr key={customer.id}>
         <td>{index + 1}</td>
-        <td>{bank.fullName}</td>
-        <td>{bank.abbreviation}</td>
+        <td>{customer.firstName + " " + customer.lastName}</td>
+        <td>{customer.balance}</td>
         <td>
-          <Button size="sm" variant="danger" onClick={() => deleteBank(bank.id)}>Delete</Button>
+          <Button size="sm" variant="danger" onClick={() => deleteCustomer(customer.id)}>Delete</Button>
         </td>
       </tr>
     )
   })
 
   useEffect(() => {
-    getBanks()
+    getCustomers()
   }, [])
+
 
   return (
     <>
       <Navbar />
       <div className="container">
 
-        <SaveBank getBanks={getBanks} />
+        <CustomerForm getCustomers={getCustomers} />
+
         {isLoading && <p>Loading...</p>}
         {error &&
           <div className="d-flex align-items-center full-h mt-3">
             <div className="col-sm-12 col-md-8 mx-auto">
               <div className="jumbotron">
                 <div className="form-group col-sm-12 col-md-12 col-lg-12 text-center">
-                  <h2>Banks not found</h2>
+                  <h2>Customers not found</h2>
                 </div>
               </div>
             </div>
           </div>
         }
 
-        {!error && banks.length > 0 &&
 
+        {!error && customers?.length > 0 &&
           <Table striped bordered responsive hover>
             <thead>
               <tr>
                 <th>Sr no.</th>
-                <th>Bank name</th>
-                <th>Abbreviation</th>
+                <th>Fullname</th>
+                <th>Balance</th>
                 <th>Delete</th>
               </tr>
             </thead>
             <tbody>
-              {renderBanks}
+              {renderCustomers}
             </tbody>
           </Table>
-
         }
       </div>
     </>
   );
 }
 
-export default Bank;
+export default Customer;
