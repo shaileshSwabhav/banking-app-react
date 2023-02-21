@@ -10,9 +10,11 @@ const CustomerForm = ({ getCustomers, customer }) => {
 
   const handleClose = () => {
     setShow(false)
+    reset()
   }
 
   const handleShow = () => {
+    reset()
     setShow(true)
   }
 
@@ -25,7 +27,7 @@ const CustomerForm = ({ getCustomers, customer }) => {
     balance: customer ? customer.balance : 1000,
   }
 
-  const { register, handleSubmit, formState } = useForm({ defaultValues: customerForm })
+  const { register, handleSubmit, formState, reset } = useForm({ defaultValues: customerForm })
 
   const onSubmit = (customerData) => {
     customerData.balance = parseFloat(customerData.balance)

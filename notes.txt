@@ -5,3 +5,5 @@ useEffect
 - useEffect should not change state coz it can use forever loop and stage change and rerender
 - passing [] will run useEffect only once during first render
 
+
+https://dev.to/adefam/create-update-add-and-delete-sequelize-migration-eoa

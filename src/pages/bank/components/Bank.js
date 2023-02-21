@@ -12,6 +12,7 @@ const Bank = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
+  const isAdmin = localStorage.getItem("rolename")?.toLowerCase() === "admin"
 
   const getBanks = async () => {
     try {
@@ -67,7 +68,7 @@ const Bank = () => {
       <Navbar />
       <div className="container">
 
-        <SaveBank getBanks={getBanks} />
+        {isAdmin && <SaveBank getBanks={getBanks} />}
         {isLoading && <p>Loading...</p>}
         {error &&
           <div className="d-flex align-items-center full-h mt-3">

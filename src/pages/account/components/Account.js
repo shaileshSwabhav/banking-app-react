@@ -1,13 +1,25 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Navbar from '../../../layout/Navbar/Navbar';
-import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
 import AccountForm from "./AccountForm";
 import { getAccounts as getAccountsService, deleteAccount as deleteAccountService } from "../../../service/account";
-import { accountTransaction as accountTransactionService } from '../../../service/accountTransaction'
+import { addAccountTransaction as accountTransactionService } from '../../../service/accountTransaction'
+import { Modal, Button, Table } from "react-bootstrap";
+import { useForm } from "react-hook-form";
 
 export function Account() {
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => {
+    setShow(false)
+    reset()
+  }
+
+  const handleShow = () => {
+    reset()
+    setShow(true)
+  }
 
   const transactionType = {
     deposit: "deposit",
@@ -16,26 +28,25 @@ export function Account() {
   }
 
   const { bankID } = useParams()
+  const navigate = useNavigate()
   const [accounts, setAccounts] = useState([])
+  const [transferAccounts, setTransferAccounts] = useState([])
   const [error, setError] = useState(null)
 
-  const customerID = localStorage.getItem('rolename').toLowerCase() === 'customer' ? localStorage.getItem('credentialID') : null
-
-  // const [searchParams, setSearchParams] = useSearchParams()
-  // console.log(searchParams.get("name"));
+  const customerID = localStorage.getItem('rolename')?.toLowerCase() === 'customer' ? localStorage.getItem('credentialID') : null
 
   const getAccounts = async () => {
     try {
-      const querparams = {}
+      const queryparams = {}
       if (bankID) {
-        querparams.bankID = bankID
+        queryparams.bankID = bankID
       }
 
       if (customerID) {
-        querparams.customerID = customerID
+        queryparams.customerID = customerID
       }
 
-      const response = await getAccountsService(querparams)
+      const response = await getAccountsService(queryparams)
       console.log(response);
 
       setAccounts(response.data)
@@ -44,6 +55,26 @@ export function Account() {
       setError(error.message.message)
     }
   }
+
+  const getTransferAccounts = async () => {
+    try {
+      const response = await getAccountsService()
+      console.log(response);
+      const acc = []
+
+      for (let index = 0; index < response.data.length; index++) {
+        if (response.data[index].customerID != customerID) {
+          acc.push(response.data[index])
+        }
+      }
+
+      setTransferAccounts(acc)
+    } catch (error) {
+      console.error(error);
+      setError(error.message.message)
+    }
+  }
+
 
   const deleteAccount = async (accountID) => {
     console.log(accountID);
@@ -58,86 +89,140 @@ export function Account() {
     }
   }
 
-  const deposit = async (account) => {
+  const deposit = async (e, account) => {
+    e.stopPropagation()
     console.log("depositing to ", account);
-    const accountTransaction = {
-      toAccountID: account.id,
-      fromAccountID: null,
-      amount: 100,
+    reset({
+      type: "deposit",
       bankID: account.bankID,
-      type: transactionType.deposit,
-      date: new Date().toLocaleDateString("en-US")
-    }
-
-    try {
-      const response = await accountTransactionService(account.id, transactionType.deposit, accountTransaction)
-      console.log(response);
-      getAccounts()
-    } catch (error) {
-      console.error(error);
-      alert(error.message?.message)
-    }
-  }
-
-  const withdraw = async (account) => {
-    console.log("withdrawing from ", account)
-
-    const accountTransaction = {
       fromAccountID: account.id,
-      toAccountID: null,
-      amount: 100,
-      bankID: account.bankID,
-      type: transactionType.withdraw,
-      date: new Date().toLocaleDateString("en-US")
-    }
+      date: new Date().toLocaleDateString("en-US"),
+    })
 
+    handleShow()
+  }
+
+  const withdraw = async (e, account) => {
+    e.stopPropagation()
+    console.log("withdrawing from ", account)
+    reset({
+      type: "withdraw",
+      bankID: account.bankID,
+      fromAccountID: account.id,
+      date: new Date().toLocaleDateString("en-US"),
+    })
+
+    handleShow()
+  }
+
+
+  const transfer = async (e, account) => {
+    console.log("transfer clicked by ", account);
+    e.stopPropagation()
+    reset({
+      type: "transfer",
+      bankID: account.bankID,
+      fromAccountID: account.id,
+      date: new Date().toLocaleDateString("en-US"),
+    })
+
+    setTransferAccounts([])
+
+    getTransferAccounts()
+    handleShow()
+
+  }
+
+  const addTransaction = async (transaction) => {
+    console.log(transaction);
     try {
-      const response = await accountTransactionService(account.id, transactionType.withdraw, accountTransaction)
+      const response = await accountTransactionService(transaction.fromAccountID, transaction.type, transaction)
       console.log(response);
-      getAccounts()
+      // getAccounts()
+      handleClose()
     } catch (error) {
       console.error(error);
       alert(error.message?.message)
     }
   }
 
+  useEffect(() => {
+    getAccounts()
+  }, [])
 
-  const transfer = async (account) => {
-    console.log("transfer clicked by ", account);
+  const onSubmit = async (transactionData) => {
+    transactionData.amount = parseFloat(transactionData.amount)
+    addTransaction(transactionData)
+  }
 
-    const accountTransaction = {
-      toAccountID: account.id,
-      fromAccountID: null,
-      amount: 100,
-      bankID: account.bankID,
-      type: transactionType.transfer,
-      date: new Date().toLocaleDateString("en-US")
-    }
+  const { register, handleSubmit, formState, reset, watch } = useForm()
 
-    try {
-      const response = await accountTransactionService(account.id, transactionType.transfer, accountTransaction)
-      console.log(response);
-      getAccounts()
-    } catch (error) {
-      console.error(error);
-      alert(error.message?.message)
-    }
+
+  const renderOptions = transferAccounts.map((option, index) => {
+    return (
+      <option value={option.id} key={index}>{option['accountName']}</option>
+    )
+  })
+
+  const transactionModal = (
+    <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
+      <Modal.Header closeButton>
+        <Modal.Title>Add Transaction</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="form-floating mb-3">
+            <input type="number" className="form-control" id="amount" placeholder="1000"
+              {...register("amount", {
+                required: "Amount must be specified",
+                min: {
+                  value: 100,
+                  message: "Minimum amount is 100"
+                },
+                max: {
+                  value: 10000,
+                  message: "Maximum amount is 10000"
+                },
+              })} />
+            <label htmlFor="amount">Amount</label>
+            {formState.errors.amount && <span className="text-red">{formState.errors.amount.message}</span>}
+          </div>
+          {watch("type")?.toLowerCase() == 'transfer' &&
+            <div className="form-floating mb-3">
+              <select className="form-control" id="toAccountID" {...register("toAccountID", { required: true })}>
+                <option value="">Select Account</option>
+                {renderOptions}
+              </select>
+              <label htmlFor="toAccountID">Account</label>
+              {formState.errors.toAccountID && <span className="text-red">Account must be specified</span>}
+            </div>
+          }
+          <Button type="submit" variant="primary">
+            Save Changes
+          </Button>
+        </form>
+      </Modal.Body>
+    </Modal>
+  )
+
+  const navigateToTransactions = (accountID) => {
+    navigate(`${accountID}/transactions`)
   }
 
   const renderAccounts = accounts.map((account, index) => {
     return (
-      <tr key={account.id} className='cursor-pointer'>
+      <tr key={account.id} className='cursor-pointer' onClick={() => navigateToTransactions(account.id)}>
         <td>{index + 1}</td>
         <td>{account.accountName}</td>
         <td>{account.balance}</td>
         <td>
-          <Button size="sm" variant="info" onClick={() => deposit(account)}>Deposit</Button>
+          <Button size="sm" variant="info" onClick={(e) => deposit(e, account)}>Deposit</Button>
         </td>
         <td>
-          <Button size="sm" variant="info" onClick={() => withdraw(account)}>Withdraw</Button>
+          <Button size="sm" variant="info" onClick={(e) => withdraw(e, account)}>Withdraw</Button>
         </td>
         <td>
-          <Button size="sm" variant="info" onClick={() => transfer(account)}>Transfer</Button>
+          <Button size="sm" variant="info" onClick={(e) => transfer(e, account)}>Transfer</Button>
         </td>
         <td>
           <Button size="sm" variant="danger" onClick={() => deleteAccount(account.id)}>Delete</Button>
@@ -145,10 +230,6 @@ export function Account() {
       </tr>
     )
   })
-
-  useEffect(() => {
-    getAccounts()
-  }, [])
 
   return (
     <>
@@ -158,7 +239,7 @@ export function Account() {
 
         <AccountForm getAccounts={getAccounts} />
 
-        {(error || accounts.length == 0) &&
+        {(error || accounts.length === 0) &&
           <div className="d-flex align-items-center full-h mt-3">
             <div className="col-sm-12 col-md-8 mx-auto">
               <div className="jumbotron">
@@ -190,6 +271,8 @@ export function Account() {
           </Table>
 
         }
+
+        {transactionModal}
 
       </div>
     </>

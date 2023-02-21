@@ -11,9 +11,11 @@ const AccountForm = ({ getAccounts, account }) => {
 
   const handleClose = () => {
     setShow(false)
+    reset()
   }
 
   const handleShow = () => {
+    reset()
     setShow(true)
   }
 
@@ -41,7 +43,7 @@ const AccountForm = ({ getAccounts, account }) => {
     customerID: customerID,
   }
 
-  const { register, handleSubmit, formState } = useForm({ defaultValues: accountForm })
+  const { register, handleSubmit, formState, reset } = useForm({ defaultValues: accountForm })
   // register -> takes 2 arguments i.e. name and options
   // trigger -> used to trigger some validation manually. it usually gets triggered automatically.
 
@@ -51,9 +53,6 @@ const AccountForm = ({ getAccounts, account }) => {
     }
 
     accountData.balance = parseFloat(accountData.balance)
-
-    console.log(accountData);
-
     if (account) {
       updateAccount(accountData)
       return
@@ -126,7 +125,7 @@ const AccountForm = ({ getAccounts, account }) => {
               </select>
               <label htmlFor="bank">Bank</label>
               {formState.errors.bankID && <span className="text-red">Bank must be specified</span>}
-            </div >
+            </div>
             <div className="form-floating mb-3">
               <input type="number" className="form-control" id="balance" placeholder="1000"
                 {...register("balance", {

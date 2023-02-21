@@ -4,18 +4,26 @@ import { getCustomers as getCustomerService } from "../../../service/customer";
 import CustomerForm from "./CustomerForm";
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
+import Paginate from "../../../layout/Paginate/Pagination";
 
 const Customer = () => {
 
   const [customers, setCustomer] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [totalCount, setTotalCount] = useState(0)
 
   const getCustomers = async () => {
     try {
       setIsLoading(true)
-      const response = await getCustomerService()
+      setCustomer([])
+      let queryparams = {
+        offset: offset,
+        limit: limit,
+      }
+      const response = await getCustomerService(queryparams)
       console.log(response);
+      setTotalCount(parseInt(response.headers.get("X-Total-Count")))
       setCustomer(response.data)
 
     } catch (error) {
@@ -30,26 +38,37 @@ const Customer = () => {
     console.log(customerID);
   }
 
+  let limit = 5
+  const [offset, setOffset] = useState(0)
+
+  const changePage = (pageNumber) => {
+    setOffset(pageNumber)
+  }
+
+  const toggleCredential = async (customerID) => {
+    console.log(customerID);
+  }
+
   useEffect(() => {
     getCustomers()
-  }, [])
+  }, [offset])
 
   const renderCustomers = customers.map((customer, index) => {
     return (
       <tr key={customer.id}>
-        <td>{index + 1}</td>
+        <td>{(index + 1) + (offset * limit)}</td>
         <td>{customer.firstName + " " + customer.lastName}</td>
+        <td>{customer.email}</td>
         <td>{customer.balance}</td>
+        <td>
+          <Button size="sm" variant="danger" onClick={() => toggleCredential(customer.id)}>Delete</Button>
+        </td>
         <td>
           <Button size="sm" variant="danger" onClick={() => deleteCustomer(customer.id)}>Delete</Button>
         </td>
       </tr>
     )
   })
-
-  useEffect(() => {
-    getCustomers()
-  }, [])
 
 
   return (
@@ -72,21 +91,27 @@ const Customer = () => {
           </div>
         }
 
-
         {!error && customers?.length > 0 &&
-          <Table striped bordered responsive hover>
-            <thead>
-              <tr>
-                <th>Sr no.</th>
-                <th>Fullname</th>
-                <th>Balance</th>
-                <th>Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {renderCustomers}
-            </tbody>
-          </Table>
+
+          <>
+            <Paginate onClick={changePage} offset={offset} totalCount={totalCount} limit={limit} />
+
+            <Table striped bordered responsive hover>
+              <thead>
+                <tr>
+                  <th>Sr no.</th>
+                  <th>Fullname</th>
+                  <th>Email</th>
+                  <th>Balance</th>
+                  <th>Active</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {renderCustomers}
+              </tbody>
+            </Table>
+          </>
         }
       </div>
     </>
