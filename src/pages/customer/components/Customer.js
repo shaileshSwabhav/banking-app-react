@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import Navbar from '../../../layout/Navbar/Navbar';
 import { getCustomers as getCustomerService } from "../../../service/customer";
+import { updateCredential as updateCredentialService } from "../../../service/auth";
 import CustomerForm from "./CustomerForm";
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 import Paginate from "../../../layout/Paginate/Pagination";
 
 const Customer = () => {
@@ -45,8 +46,26 @@ const Customer = () => {
     setOffset(pageNumber)
   }
 
-  const toggleCredential = async (customerID) => {
-    console.log(customerID);
+  const toggleCredential = async (e, customer) => {
+    customer.credential.isActive = !customer.credential.isActive
+    console.log(e.currentTarget.checked)
+    console.log(customer)
+    updateCredential({
+      id: customer.id,
+      username: customer.email,
+      roleName: "Customer",
+      isActive: customer.credential.isActive,
+    })
+  }
+
+  const updateCredential = async (credential) => {
+    try {
+      console.log(credential);
+      await updateCredentialService(credential)
+      getCustomers()
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   useEffect(() => {
@@ -61,11 +80,20 @@ const Customer = () => {
         <td>{customer.email}</td>
         <td>{customer.balance}</td>
         <td>
-          <Button size="sm" variant="danger" onClick={() => toggleCredential(customer.id)}>Delete</Button>
+          {/* <div className="form-check form-switch">
+            <input className="form-check-input" type="checkbox" role="switch"
+              value={customer.credential.isActive} onClick={(e) => toggleCredential(e, customer)} />
+          </div> */}
+          <Form.Check
+            type="switch"
+            id="custom-switch"
+            checked={customer.credential.isActive}
+            onChange={(e) => toggleCredential(e, customer)}
+          />
         </td>
-        <td>
+        {/* <td>
           <Button size="sm" variant="danger" onClick={() => deleteCustomer(customer.id)}>Delete</Button>
-        </td>
+        </td> */}
       </tr>
     )
   })
@@ -104,7 +132,7 @@ const Customer = () => {
                   <th>Email</th>
                   <th>Balance</th>
                   <th>Active</th>
-                  <th>Delete</th>
+                  {/* <th>Delete</th> */}
                 </tr>
               </thead>
               <tbody>
