@@ -14,6 +14,18 @@ export const login = async (credential) => {
   }
 }
 
+export const logout = async () => {
+  try {
+    const response = await axios.post(`${constants.BASE_URL}/auth/logout`, {}, {
+      headers: { "Content-type": "application/json" },
+    })
+    return response
+  } catch (error) {
+    console.error(error);
+    throw new axios.AxiosError(error)
+  }
+}
+
 export const updateCredential = async (credential) => {
   try {
     const headers = { "Content-type": "application/json" }

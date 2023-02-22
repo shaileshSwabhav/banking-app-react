@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from '../../../layout/Navbar/Navbar';
 import { getCustomers as getCustomerService } from "../../../service/customer";
 import { updateCredential as updateCredentialService } from "../../../service/auth";
@@ -6,9 +6,23 @@ import CustomerForm from "./CustomerForm";
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import Paginate from "../../../layout/Paginate/Pagination";
+import { Modal } from "react-bootstrap";
+import Account from "../../account/components/Account";
 
-const Customer = () => {
+export const Customer = () => {
 
+  const [showAccount, setShowAccount] = useState(false);
+
+  const handleShowAccount = () => {
+    console.log("show account ->", showAccount);
+    setShowAccount(true)
+  }
+
+  const handleCloseAccount = () => {
+    setShowAccount(false)
+  }
+
+  const [customerID, setCustomerID] = useState("")
   const [customers, setCustomer] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -35,10 +49,6 @@ const Customer = () => {
     }
   }
 
-  const deleteCustomer = async (customerID) => {
-    console.log(customerID);
-  }
-
   let limit = 5
   const [offset, setOffset] = useState(0)
 
@@ -47,6 +57,7 @@ const Customer = () => {
   }
 
   const toggleCredential = async (e, customer) => {
+    e.preventDefault()
     customer.credential.isActive = !customer.credential.isActive
     console.log(e.currentTarget.checked)
     console.log(customer)
@@ -68,33 +79,44 @@ const Customer = () => {
     }
   }
 
+  const onRowClick = (index) => {
+    console.log(customers[index]);
+    setCustomerID(customers[index].id)
+    customers[index].isClicked = !customers[index].isClicked
+    setCustomer([...customers])
+    // setShowAccount(true)
+    // handleShowAccount()
+  }
+
   useEffect(() => {
     getCustomers()
   }, [offset])
 
   const renderCustomers = customers.map((customer, index) => {
     return (
-      <tr key={customer.id}>
-        <td>{(index + 1) + (offset * limit)}</td>
-        <td>{customer.firstName + " " + customer.lastName}</td>
-        <td>{customer.email}</td>
-        <td>{customer.balance}</td>
-        <td>
-          {/* <div className="form-check form-switch">
-            <input className="form-check-input" type="checkbox" role="switch"
-              value={customer.credential.isActive} onClick={(e) => toggleCredential(e, customer)} />
-          </div> */}
-          <Form.Check
-            type="switch"
-            id="custom-switch"
-            checked={customer.credential.isActive}
-            onChange={(e) => toggleCredential(e, customer)}
-          />
-        </td>
-        {/* <td>
-          <Button size="sm" variant="danger" onClick={() => deleteCustomer(customer.id)}>Delete</Button>
-        </td> */}
-      </tr>
+      <React.Fragment key={customer.id}>
+        <tr onClick={() => onRowClick(index)} className="cursor-pointer">
+          <td>{(index + 1) + (offset * limit)}</td>
+          <td>{customer.firstName + " " + customer.lastName}</td>
+          <td>{customer.email} {customer.isClicked ? 'true' : 'false'}</td>
+          <td>{customer.balance}</td>
+          <td>
+            <Form.Check
+              type="switch"
+              id="custom-switch"
+              checked={customer.credential.isActive}
+              onChange={(e) => toggleCredential(e, customer)}
+            />
+          </td>
+        </tr>
+        {customer.isClicked &&
+          <tr>
+            <td colSpan="5">
+              <Account customerID={customerID} isCustomerView={true} />
+            </td>
+          </tr>
+        }
+      </React.Fragment>
     )
   })
 
@@ -120,14 +142,13 @@ const Customer = () => {
         }
 
         {!error && customers?.length > 0 &&
-
           <>
             <Paginate onClick={changePage} offset={offset} totalCount={totalCount} limit={limit} />
 
             <Table striped bordered responsive hover>
               <thead>
                 <tr>
-                  <th>Sr no.</th>
+                  <th>Sr no. {showAccount ? 'do' : 'dont'}</th>
                   <th>Fullname</th>
                   <th>Email</th>
                   <th>Balance</th>
@@ -141,9 +162,23 @@ const Customer = () => {
             </Table>
           </>
         }
+
+        {/* {showAccount &&
+          <>
+            <Modal show={showAccount} size="lg" onHide={handleCloseAccount} backdrop="static" keyboard={false}>
+              <Modal.Header closeButton>
+                <Modal.Title>Customer Accounts</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Account customerID={customerID} isCustomerView={true} />
+              </Modal.Body>
+            </Modal>
+          </>
+        } */}
+
       </div>
     </>
   );
 }
 
-export default Customer;
+// export default Customer;

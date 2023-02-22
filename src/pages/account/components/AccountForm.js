@@ -61,7 +61,6 @@ const AccountForm = ({ getAccounts, account }) => {
     addAccount(accountData)
   }
 
-
   const addAccount = async (account) => {
     try {
       const response = await addAccountService(account)

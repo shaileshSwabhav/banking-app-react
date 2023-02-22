@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAccountTransactions as getAccountTransactionService } from '../../../service/accountTransaction'
-import { Table } from 'react-bootstrap';
+import { saveAsExcelFile, createExcelWorkBook, createExcelWorkSheet, appendToExcelWorkSheet } from "../../../service/file-ops";
+import { Button, Table } from 'react-bootstrap';
 import Navbar from '../../../layout/Navbar/Navbar';
 import Paginate from "../../../layout/Paginate/Pagination";
+import { format } from 'date-fns'
 
 const Transaction = () => {
+
   const { accountID } = useParams()
+
+  console.log(" ===== accountID -> ", accountID);
+
   const [totalCount, setTotalCount] = useState(0)
   const [transactions, setTransactions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
@@ -17,6 +23,7 @@ const Transaction = () => {
       setTransactions([])
       setIsLoading(true)
       console.log(limit, offset);
+
       let queryparams = {
         limit: limit,
         offset: offset,
@@ -41,6 +48,28 @@ const Transaction = () => {
     setOffset(pageNumber)
   }
 
+  const onDownloadTransactionClick = async () => {
+    const workbook = createExcelWorkBook()
+    let worksheet
+
+    for (let index = 0; index < totalCount / limit; index++) {
+      let queryparams = {
+        limit: limit,
+        offset: index,
+      }
+      const response = await getAccountTransactionService(accountID, queryparams)
+      console.log(response)
+      if (index == 0) {
+        worksheet = createExcelWorkSheet(response.data)
+        continue
+      }
+
+      appendToExcelWorkSheet(worksheet, response.data)
+    }
+
+    saveAsExcelFile(workbook, worksheet, "transaction")
+  }
+
   useEffect(() => {
     getAccountTransactions()
   }, [offset])
@@ -49,7 +78,7 @@ const Transaction = () => {
     return (
       <tr key={transaction.id}>
         <td>{(index + 1) + (offset * limit)}</td>
-        <td>{transaction.date}</td>
+        <td>{format(new Date(transaction.date), 'dd/MM/yyyy')}</td>
         <td>{transaction.type}</td>
         <td>{transaction.amount}</td>
         <td>{transaction.bank.fullName}</td>
@@ -78,8 +107,13 @@ const Transaction = () => {
 
         {!error && transactions?.length > 0 &&
           <>
-            <Paginate onClick={changePage} offset={offset} totalCount={totalCount} limit={limit} />
+            <div className="d-flex justify-content-end align-items-baseline">
+              <Paginate className='mx-2' onClick={changePage} offset={offset} totalCount={totalCount} limit={limit} />
+              <Button className='mx-2' variant="primary" size="sm" onClick={onDownloadTransactionClick}>Download excel</Button>
+            </div>
             <br />
+
+
             <Table striped bordered responsive hover>
               <thead>
                 <tr>

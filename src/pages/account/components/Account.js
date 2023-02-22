@@ -7,17 +7,15 @@ import { addAccountTransaction as accountTransactionService } from '../../../ser
 import { Modal, Button, Table } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 
-export function Account() {
+export function Account(props) {
 
   const [show, setShow] = useState(false);
 
   const handleClose = () => {
     setShow(false)
-    reset()
   }
 
   const handleShow = () => {
-    reset()
     setShow(true)
   }
 
@@ -32,8 +30,11 @@ export function Account() {
   const [accounts, setAccounts] = useState([])
   const [transferAccounts, setTransferAccounts] = useState([])
   const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const customerID = localStorage.getItem('rolename')?.toLowerCase() === 'customer' ? localStorage.getItem('credentialID') : null
+  const isCustomer = localStorage.getItem('rolename')?.toLowerCase() === 'customer'
+  const customerID = props.customerID ? props.customerID :
+    (localStorage.getItem('rolename')?.toLowerCase() === 'customer' ? localStorage.getItem('credentialID') : null)
 
   const getAccounts = async () => {
     try {
@@ -58,6 +59,7 @@ export function Account() {
 
   const getTransferAccounts = async () => {
     try {
+      setIsLoading(true)
       const response = await getAccountsService()
       console.log(response);
       const acc = []
@@ -72,9 +74,10 @@ export function Account() {
     } catch (error) {
       console.error(error);
       setError(error.message.message)
+    } finally {
+      setIsLoading(false)
     }
   }
-
 
   const deleteAccount = async (accountID) => {
     console.log(accountID);
@@ -93,7 +96,7 @@ export function Account() {
     e.stopPropagation()
     console.log("depositing to ", account);
     reset({
-      type: "deposit",
+      type: transactionType.deposit,
       bankID: account.bankID,
       fromAccountID: account.id,
       date: new Date().toLocaleDateString("en-US"),
@@ -106,7 +109,7 @@ export function Account() {
     e.stopPropagation()
     console.log("withdrawing from ", account)
     reset({
-      type: "withdraw",
+      type: transactionType.withdraw,
       bankID: account.bankID,
       fromAccountID: account.id,
       date: new Date().toLocaleDateString("en-US"),
@@ -115,12 +118,11 @@ export function Account() {
     handleShow()
   }
 
-
   const transfer = async (e, account) => {
     console.log("transfer clicked by ", account);
     e.stopPropagation()
     reset({
-      type: "transfer",
+      type: transactionType.transfer,
       bankID: account.bankID,
       fromAccountID: account.id,
       date: new Date().toLocaleDateString("en-US"),
@@ -215,31 +217,36 @@ export function Account() {
         <td>{index + 1}</td>
         <td>{account.accountName}</td>
         <td>{account.balance}</td>
-        <td>
-          <Button size="sm" variant="info" onClick={(e) => deposit(e, account)}>Deposit</Button>
-        </td>
-        <td>
-          <Button size="sm" variant="info" onClick={(e) => withdraw(e, account)}>Withdraw</Button>
-        </td>
-        <td>
-          <Button size="sm" variant="info" onClick={(e) => transfer(e, account)}>Transfer</Button>
-        </td>
-        <td>
-          <Button size="sm" variant="danger" onClick={() => deleteAccount(account.id)}>Delete</Button>
-        </td>
+        {isCustomer &&
+          <>
+            <td>
+              <Button size="sm" variant="info" onClick={(e) => deposit(e, account)}>Deposit</Button>
+            </td>
+            <td>
+              <Button size="sm" variant="info" onClick={(e) => withdraw(e, account)}>Withdraw</Button>
+            </td>
+            <td>
+              <Button size="sm" variant="info" onClick={(e) => transfer(e, account)}>Transfer</Button>
+            </td>
+            <td>
+              <Button size="sm" variant="danger" onClick={() => deleteAccount(account.id)}>Delete</Button>
+            </td>
+          </>
+        }
       </tr>
     )
   })
 
   return (
     <>
-      <Navbar />
+      {!props?.isCustomerView && <Navbar />}
 
       <div className="container">
 
-        <AccountForm getAccounts={getAccounts} />
+        {!props?.isCustomerView && <AccountForm getAccounts={getAccounts} />}
+        {isLoading && <p>Loading...</p>}
 
-        {(error || accounts.length === 0) &&
+        {(error && isLoading) &&
           <div className="d-flex align-items-center full-h mt-3">
             <div className="col-sm-12 col-md-8 mx-auto">
               <div className="jumbotron">
@@ -251,25 +258,27 @@ export function Account() {
           </div>
         }
 
-        {!error && accounts.length > 0 &&
-
+        {!error && !isLoading && accounts.length > 0 &&
           <Table striped bordered responsive hover>
             <thead>
               <tr>
                 <th>Sr no.</th>
                 <th>Account name</th>
                 <th>Balance</th>
-                <th>Deposit</th>
-                <th>Withdraw</th>
-                <th>Transfer</th>
-                <th>Delete</th>
+                {isCustomer &&
+                  <>
+                    <th>Deposit </th>
+                    <th>Withdraw</th>
+                    <th>Transfer</th>
+                    <th>Delete</th>
+                  </>
+                }
               </tr>
             </thead>
             <tbody>
               {renderAccounts}
             </tbody>
           </Table>
-
         }
 
         {transactionModal}

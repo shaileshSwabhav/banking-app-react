@@ -13,11 +13,12 @@ const Paginate = (props) => {
     );
   }
 
-
   return (
     <>
-      <h2>Total: {props.totalCount}</h2>
-      <Pagination>{items}</Pagination>
+      <div className='d-flex flex-column align-items-center'>
+        <h2>Total: {props.totalCount}</h2>
+        <Pagination>{items}</Pagination>
+      </div>
     </>
   );
 }

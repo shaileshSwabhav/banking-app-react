@@ -52,9 +52,11 @@ const Bank = () => {
         <td>{index + 1}</td>
         <td>{bank.fullName}</td>
         <td>{bank.abbreviation}</td>
-        <td>
-          <Button size="sm" variant="danger" onClick={() => deleteBank(bank.id)}>Delete</Button>
-        </td>
+        {isAdmin &&
+          <td>
+            <Button size="sm" variant="danger" onClick={() => deleteBank(bank.id)}>Delete</Button>
+          </td>
+        }
       </tr>
     )
   })
@@ -90,7 +92,7 @@ const Bank = () => {
                 <th>Sr no.</th>
                 <th>Bank name</th>
                 <th>Abbreviation</th>
-                <th>Delete</th>
+                {isAdmin && <th>Delete</th>}
               </tr>
             </thead>
             <tbody>
