@@ -8,6 +8,7 @@ import Form from 'react-bootstrap/Form';
 import Paginate from "../../../layout/Paginate/Pagination";
 import { Modal } from "react-bootstrap";
 import Account from "../../account/components/Account";
+import { PacmanLoader } from "react-spinners";
 
 export const Customer = () => {
 
@@ -128,7 +129,11 @@ export const Customer = () => {
 
         <CustomerForm getCustomers={getCustomers} />
 
-        {isLoading && <p>Loading...</p>}
+        {isLoading && 
+          <div className="d-flex justify-content-center align-items-center">
+            <PacmanLoader color="#36d7b7" />
+          </div>
+        }
         {error &&
           <div className="d-flex align-items-center full-h mt-3">
             <div className="col-sm-12 col-md-8 mx-auto">
